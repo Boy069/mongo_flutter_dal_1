@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:mongo_flutter_lab_1/providers/user_provider.dart'; // สมมุติว่ามี UserProvider
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -21,9 +23,10 @@ class HomeScreen extends StatelessWidget {
             TextButton(
               child: const Text('ออกจากระบบ'),
               onPressed: () {
+                // ล้างข้อมูลผู้ใช้ที่เกี่ยวข้อง
+                Provider.of<UserProvider>(context, listen: false).onLogout();
                 Navigator.of(context).pop(); // close the dialog
-                Navigator.popAndPushNamed(
-                    context, '/login'); // navigate to login screen
+                Navigator.pushReplacementNamed(context, '/login'); // navigate to login screen
               },
             ),
           ],
@@ -47,7 +50,10 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: const Text('Welcome to the Home Screen!'),
+        child: const Text(
+          'Welcome to the Home Screen!',
+          style: TextStyle(fontSize: 24),
+        ),
       ),
     );
   }

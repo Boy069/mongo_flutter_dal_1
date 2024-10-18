@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:mongo_flutter_lab_1/Widget/customCliper.dart';
 import 'package:mongo_flutter_lab_1/controller/product_controller.dart';
@@ -17,6 +16,7 @@ class EditProductPage extends StatefulWidget {
 class _EditProductPageState extends State<EditProductPage> {
   final _formKey = GlobalKey<FormState>();
   late String name;
+  late String serialNumber; // เพิ่มฟิลด์สำหรับ Serial Number
   late String img;
   late int num;
   late String status;
@@ -26,6 +26,7 @@ class _EditProductPageState extends State<EditProductPage> {
     super.initState();
     // ดึงข้อมูลจาก ProductModel มาแสดงในฟอร์ม
     name = widget.product.name;
+    serialNumber = widget.product.serialNumber; // แสดง Serial Number ที่มีอยู่
     img = widget.product.img;
     num = widget.product.num;
     status = widget.product.status;
@@ -39,6 +40,7 @@ class _EditProductPageState extends State<EditProductPage> {
         context,
         productId,
         name,
+        serialNumber, // เพิ่ม Serial Number
         img,
         num,
         status,
@@ -132,6 +134,12 @@ class _EditProductPageState extends State<EditProductPage> {
                             label: 'ชื่อสินค้า',
                             initialValue: name,
                             onSaved: (value) => name = value!,
+                          ),
+                          SizedBox(height: 16),
+                          _buildTextField(
+                            label: 'Serial Number', // เพิ่มฟิลด์สำหรับ Serial Number
+                            initialValue: serialNumber,
+                            onSaved: (value) => serialNumber = value!,
                           ),
                           SizedBox(height: 16),
                           _buildTextField(

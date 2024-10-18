@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:mongo_flutter_lab_1/controller/auth_controller.dart';
 import 'package:mongo_flutter_lab_1/models/product_model.dart';
 import 'package:mongo_flutter_lab_1/providers/user_provider.dart';
 import 'package:mongo_flutter_lab_1/varibles.dart';
-import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 
 class ProductController {
   final _authController = AuthController();
@@ -16,8 +16,7 @@ class ProductController {
     var accessToken = userProvider.accessToken;
 
     try {
-      // Log the request URL for debugging
-      // print('Requesting products from: $apiURL/api/products');
+      debugPrint('Requesting products from: $apiURL/api/products');
 
       // Make the GET request
       final response = await http.get(
@@ -28,22 +27,18 @@ class ProductController {
         },
       );
 
-      // Log the response for debugging
-      // print('Response status: ${response.statusCode}');
-      // print('Response body: ${response.body}');
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // Decode the response and map it to ProductModel objects
         List<dynamic> jsonResponse = json.decode(response.body);
         return jsonResponse
             .map((product) => ProductModel.fromJson(product))
             .toList();
       } else if (response.statusCode == 401) {
         Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-        throw Exception(
-            'Refresh token expired. Please login again.'); // เพิ่ม throw Exception
+        throw Exception('Refresh token expired. Please login again.');
       } else if (response.statusCode == 403) {
-        // Refresh token and retry
         await _authController.refreshToken(context);
         accessToken = userProvider.accessToken;
         return await getProducts(context);
@@ -52,25 +47,26 @@ class ProductController {
             'Failed to load products with status code: ${response.statusCode}');
       }
     } catch (err) {
-      // If the request failed, throw an error
+      debugPrint('Error fetching products: $err');
       throw Exception('Failed to load products');
     }
   }
 
   // Insert product to the API
   Future<http.Response> insertProduct(BuildContext context, String name,
-      String img, int num, String status) async {
+      String serialNumber, String img, int num, String status) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     var accessToken = userProvider.accessToken;
     final Map<String, dynamic> insertData = {
       "name": name,
+      "serialNumber": serialNumber,
       "img": img,
       "num": num,
       "status": status,
     };
 
     try {
-      // print('Inserting product: $insertData');
+      debugPrint('Inserting product: $insertData');
 
       final response = await http.post(
         Uri.parse("$apiURL/api/"),
@@ -81,43 +77,41 @@ class ProductController {
         body: jsonEncode(insertData),
       );
 
-      // print('Response status: ${response.statusCode}');
-      // print('Response body: ${response.body}');
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
 
-      // Handle successful product insertion
       if (response.statusCode == 201) {
-        print("Product inserted successfully!");
-        return response; // ส่งคืน response เมื่อเพิ่มสินค้าสำเร็จ
+        debugPrint("Product inserted successfully!");
+        return response;
       } else if (response.statusCode == 403) {
         await _authController.refreshToken(context);
         accessToken = userProvider.accessToken;
-
-        return await insertProduct(
-            context, name, img, num, status);
+        return await insertProduct(context, name, serialNumber, img, num, status);
       } else {
-        return response; // ส่งคืน response
+        return response;
       }
     } catch (error) {
-      // Catch and print any errors during the request
+      debugPrint('Error inserting product: $error');
       throw Exception('Failed to insert product');
     }
   }
 
   // Update product by ID
   Future<http.Response> updateProduct(BuildContext context, String productId,
-      String name, String img, int num, String status) async {
+      String name, String serialNumber, String img, int num, String status) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     var accessToken = userProvider.accessToken;
 
     final Map<String, dynamic> updateData = {
       "name": name,
+      "serialNumber": serialNumber,
       "img": img,
       "num": num,
       "status": status,
     };
 
     try {
-      // print('Updating product $productId: $updateData');
+      debugPrint('Updating product $productId: $updateData');
 
       final response = await http.put(
         Uri.parse("$apiURL/api/$productId"),
@@ -128,24 +122,21 @@ class ProductController {
         body: jsonEncode(updateData),
       );
 
-      // print('Response status: ${response.statusCode}');
-      // print('Response body: ${response.body}');
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        print("Product updated successfully!");
-        return response; // ส่งคืน response
+        debugPrint("Product updated successfully!");
+        return response;
       } else if (response.statusCode == 403) {
-        // Refresh the accessToken
         await _authController.refreshToken(context);
-        accessToken =
-            userProvider.accessToken; // Update the accessToken after refresh
-
-        return await updateProduct(
-            context, productId, name, img, num, status);
+        accessToken = userProvider.accessToken;
+        return await updateProduct(context, productId, name, serialNumber, img, num, status);
       } else {
-        return response; // ส่งคืน response
+        return response;
       }
     } catch (error) {
+      debugPrint('Error updating product: $error');
       throw Exception('Failed to update product');
     }
   }
@@ -157,7 +148,7 @@ class ProductController {
     var accessToken = userProvider.accessToken;
 
     try {
-      // print('Deleting product: $productId');
+      debugPrint('Deleting product: $productId');
 
       final response = await http.delete(
         Uri.parse("$apiURL/api/$productId"),
@@ -167,11 +158,11 @@ class ProductController {
         },
       );
 
-      // print('Response status: ${response.statusCode}');
-      // print('Response body: ${response.body}');
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        print("Product deleted successfully!");
+        debugPrint("Product deleted successfully!");
         return response;
       } else if (response.statusCode == 403) {
         await _authController.refreshToken(context);
@@ -181,7 +172,7 @@ class ProductController {
         return response;
       }
     } catch (error) {
-      // print('Error deleting product: $error');
+      debugPrint('Error deleting product: $error');
       throw Exception('Failed to delete product due to error: $error');
     }
   }

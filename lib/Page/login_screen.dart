@@ -33,9 +33,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
         Provider.of<UserProvider>(context, listen: false).onLogin(userModel);
 
-        if (role == 'admin') {
+        if (role == 'approver') {
           Navigator.pushReplacementNamed(context, '/admin');
-        } else if (role == 'user') {
+        } else if (role == 'requester') {
           Navigator.pushReplacementNamed(context, '/home');
         } else {
           print('Error: Unknown role');
@@ -95,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     RichText(
                       textAlign: TextAlign.center,
                       text: TextSpan(
-                          text: 'T-Dat',
+                          text: 'Login',
                           style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w700,

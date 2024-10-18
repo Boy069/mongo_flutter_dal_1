@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mongo_flutter_lab_1/Page/AddProductPage.dart';
+import 'package:mongo_flutter_lab_1/Page/ApproveRequestsPage.dart';
+import 'package:mongo_flutter_lab_1/Page/HistoryReturnPage.dart';
+import 'package:mongo_flutter_lab_1/Page/RequestEquipmentPage.dart';
 import 'package:mongo_flutter_lab_1/Page/home_admin.dart';
 import 'package:mongo_flutter_lab_1/Page/home_screen.dart';
 import 'package:mongo_flutter_lab_1/Page/login_screen.dart';
@@ -30,6 +33,9 @@ class MyApp extends StatelessWidget {
             '/register': (context) => const RegisterPage(),
             '/admin': (context) => const HomeAdmin(),
             '/add_product': (context) => AddProductPage(),
+            '/approve_requests': (context) => const ApproveRequestsPage(), // เส้นทางใหม่
+            '/request_equipment': (context) => const RequestEquipmentPage(), // เส้นทางใหม่
+            '/returned_requests': (context) => const HistoryReturnPage(), // Add this route
           }),
     );
   }

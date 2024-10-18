@@ -32,7 +32,10 @@ class _HomeAdminState extends State<HomeAdmin> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('ยืนยันการออกจากระบบ'),
+          title: const Text(
+            'ยืนยันการออกจากระบบ',
+            style: TextStyle(color: Color(0xff821131)),
+          ),
           content: const Text('คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?'),
           actions: <Widget>[
             TextButton(
@@ -43,9 +46,11 @@ class _HomeAdminState extends State<HomeAdmin> {
             ),
             TextButton(
               child: const Text('ออกจากระบบ'),
+              style: TextButton.styleFrom(
+                foregroundColor: Color(0xff821131),
+              ),
               onPressed: () {
-                Provider.of<UserProvider>(context, listen: false)
-                    .onLogout();
+                Provider.of<UserProvider>(context, listen: false).onLogout();
                 Navigator.pushReplacementNamed(context, '/login');
               },
             ),
@@ -68,7 +73,8 @@ class _HomeAdminState extends State<HomeAdmin> {
         isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error fetching products: $error')));
+        SnackBar(content: Text('Error fetching products: $error')),
+      );
     }
   }
 
@@ -85,7 +91,10 @@ class _HomeAdminState extends State<HomeAdmin> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('ยืนยันการลบสินค้า'),
+          title: const Text(
+            'ยืนยันการลบสินค้า',
+            style: TextStyle(color: Color(0xffC7253E)),
+          ),
           content: const Text('คุณแน่ใจหรือไม่ว่าต้องการลบสินค้านี้?'),
           actions: <Widget>[
             TextButton(
@@ -96,6 +105,9 @@ class _HomeAdminState extends State<HomeAdmin> {
             ),
             TextButton(
               child: const Text('ลบ'),
+              style: TextButton.styleFrom(
+                foregroundColor: Color(0xffC7253E),
+              ),
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
@@ -114,8 +126,9 @@ class _HomeAdminState extends State<HomeAdmin> {
           setState(() {
             products.remove(product);
           });
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('ลบสินค้าสำเร็จ')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('ลบสินค้าสำเร็จ')),
+          );
         } else if (response.statusCode == 401) {
           Navigator.pushNamedAndRemoveUntil(
               context, '/login', (route) => false);
@@ -126,7 +139,8 @@ class _HomeAdminState extends State<HomeAdmin> {
         }
       } catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error deleting product: $error')));
+          SnackBar(content: Text('Error deleting product: $error')),
+        );
       }
     }
   }
@@ -191,9 +205,7 @@ class _HomeAdminState extends State<HomeAdmin> {
                         ],
                       ),
                     ),
-
                     SizedBox(height: 20),
-
                     Consumer<UserProvider>(builder: (context, userProvider, _) {
                       return Column(
                         children: [
@@ -244,8 +256,7 @@ class _HomeAdminState extends State<HomeAdmin> {
                         ],
                       );
                     }),
-
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     ElevatedButton(
@@ -260,7 +271,35 @@ class _HomeAdminState extends State<HomeAdmin> {
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context,
+                            '/approve_requests'); // ไปยังหน้าจออนุมัติคำขอ
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xffFABC3F),
+                      ),
+                      child: Text(
+                        'อนุมัติคำขอยืมอุปกรณ์',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context,
+                            '/returned_requests'); // Adjust this based on your routing
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xffFABC3F),
+                      ),
+                      child: Text(
+                        'ดูประวัติการคืน',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     if (isLoading)
                       CircularProgressIndicator()
                     else if (errorMessage != null)

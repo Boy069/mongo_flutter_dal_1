@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:mongo_flutter_lab_1/Widget/customCliper.dart';
 import 'package:mongo_flutter_lab_1/controller/product_controller.dart';
@@ -13,55 +12,56 @@ class _AddProductPageState extends State<AddProductPage> {
   final _formKey = GlobalKey<FormState>();
   final ProductController _productController = ProductController(); // Create ProductController instance
   String productName = '';
+  String serialNumber = ''; // เพิ่มฟิลด์สำหรับ Serial Number
   String img = '';
   int num = 0;
   String status = '';
 
   // แยกฟังก์ชันสำหรับเพิ่มสินค้า
   void _addNewProduct() {
-  if (_formKey.currentState!.validate()) {
-    _formKey.currentState!.save();
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
 
-    // พิมพ์ค่าสำหรับการดีบัก
-    print('Adding Product: name=$productName, img=$img, num=$num, status=$status');
+      // พิมพ์ค่าสำหรับการดีบัก
+      print('Adding Product: name=$productName, serialNumber=$serialNumber, img=$img, num=$num, status=$status');
 
-    _productController.insertProduct(
-      context,
-      productName,
-      img,
-      num,
-      status,
-    ).then((response) {
-      // ตรวจสอบสถานะการตอบกลับ
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      _productController.insertProduct(
+        context,
+        productName,
+        serialNumber, // เพิ่ม Serial Number
+        img,
+        num,
+        status,
+      ).then((response) {
+        // ตรวจสอบสถานะการตอบกลับ
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
 
-      if (response.statusCode == 201) {
-        // การดำเนินการเมื่อสำเร็จ
+        if (response.statusCode == 201) {
+          // การดำเนินการเมื่อสำเร็จ
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('เพิ่มสินค้าเรียบร้อยแล้ว')),
+          );
+          Navigator.pushReplacementNamed(context, '/admin');
+        } else if (response.statusCode == 401) {
+          Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Refresh token expired. Please login again.')),
+          );
+        } else {
+          // จัดการกับการตอบกลับข้อผิดพลาดอื่น ๆ
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('เกิดข้อผิดพลาด: ${response.statusCode} - ${response.body}')),
+          );
+        }
+      }).catchError((error) {
+        // จัดการกับข้อผิดพลาดที่ไม่คาดคิด
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('เพิ่มสินค้าเรียบร้อยแล้ว')),
+          SnackBar(content: Text('เกิดข้อผิดพลาด: $error')),
         );
-        Navigator.pushReplacementNamed(context, '/admin');
-      } else if (response.statusCode == 401) {
-        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Refresh token expired. Please login again.')),
-        );
-      } else {
-        // จัดการกับการตอบกลับข้อผิดพลาดอื่น ๆ
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('เกิดข้อผิดพลาด: ${response.statusCode} - ${response.body}')),
-        );
-      }
-    }).catchError((error) {
-      // จัดการกับข้อผิดพลาดที่ไม่คาดคิด
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('เกิดข้อผิดพลาด: $error')),
-      );
-    });
+      });
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +138,19 @@ class _AddProductPageState extends State<AddProductPage> {
                             },
                             onSaved: (value) {
                               productName = value!;
+                            },
+                          ),
+                          SizedBox(height: 16),
+                          _buildTextField(
+                            label: 'Serial Number', // เพิ่มฟิลด์สำหรับ Serial Number
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'กรุณากรอก Serial Number';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              serialNumber = value!;
                             },
                           ),
                           SizedBox(height: 16),
